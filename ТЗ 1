@@ -1,0 +1,28 @@
+#!/bin/bash
+
+inputDirectory="$1"
+outputDirectory="$2"
+
+if [ ! -d "$outputDirectory" ]; then
+    mkdir -p "$outputDirectory"
+fi
+
+find "$inputDirectory" -type f | while read -r path; do
+    filename=$(basename -- "$path")
+    destFilePath="$outputDirectory/$filename"
+    counter_of_identical_files=1
+
+    while [ -f "$destFilePath" ]; do
+        baseName="${filename%.*}"
+        extension="${filename##*.}"
+
+        if [[ "$filename" == *.* ]]; then
+            destFilePath="$outputDirectory/${baseName}($counter_of_identical_files).$extension"
+        else
+            destFilePath="$outputDirectory/${baseName}_$counter_of_identical_files"
+        fi
+        ((counter_of_identical_files++))
+    done
+
+    cp "$path" "$destFilePath"
+done
